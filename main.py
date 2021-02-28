@@ -3,6 +3,8 @@
 #Custom Fonts
 #Custom Select colour
 #Custom fonts sizes
+#Custom font colour
+#Make it a .exe file (last thing)
 
 from tkinter import *
 from tkinter import filedialog
@@ -12,12 +14,15 @@ from tkinter import messagebox
 
 root = Tk()
 root.title("Notepad-M")
-root.geometry("1200x606")
+root.geometry("1200x680")
 my_frame = Frame(root)
 my_frame.pack(pady=5)
 
 global open_status_name
 open_status_name = False
+
+global selected
+selected = False
 
 def saved_message():
     response = messagebox.showinfo("File saved", "Saved")
@@ -77,18 +82,46 @@ def cut_text(e):
         my_text.delete("sel.first", "sel.last")
 
 def copy_text(e):
-    pass
+    global selected
+    if my_text.selection_get():
+        selected = my_text.selection_get()
 
 def paste_text(e):
-    pass
+    if selected:
+        position = my_text.index(INSERT)
+        my_text.insert(position, selected)
+
+def bold_text():
+    bold_font = font.Font(my_text, my_text.cget("font"))
+    bold_font.configure(weight="bold")
+    my_text.tag_configure("bold", font=bold_font)
+    current_tags = my_text.tag_names("sel.first")
+    if "bold" in current_tags:
+        my_text.tag_remove("bold", "sel.first", "sel.last")
+    else:
+        my_text.tag_add("bold", "sel.first", "sel.last")
+
+def italics_text():
+    italics_font = font.Font(my_text, my_text.cget("font"))
+    italics_font.configure(slant="italic")
+    my_text.tag_configure("italic", font=italics_font)
+    current_tags = my_text.tag_names("sel.first")
+    if "italic" in current_tags:
+        my_text.tag_remove("italic", "sel.first", "sel.last")
+    else:
+        my_text.tag_add("italic", "sel.first", "sel.last")
 
 text_scroll = Scrollbar(my_frame)
 text_scroll.pack(side=RIGHT, fill=Y)
 
-my_text = Text(my_frame, width=97, height=23.5, font=("Helvetica", 16), selectbackground="yellow", selectforeground="black", undo=True, yscrollcommand=text_scroll.set)
+x_scroll = Scrollbar(my_frame, orient='horizontal')
+x_scroll.pack(side=BOTTOM, fill=X)
+
+my_text = Text(my_frame, width=97, height=26, font=("Helvetica", 16), selectbackground="yellow", selectforeground="black", undo=True, yscrollcommand=text_scroll.set, wrap="none", xscrollcommand=x_scroll.set)
 my_text.pack()
 
 text_scroll.config(command=my_text.yview)
+x_scroll.config(command=my_text.xview)
 
 my_menu = Menu(root)
 root.config(menu=my_menu)
@@ -103,11 +136,16 @@ file_menu.add_command(label="Exit", command=root.quit)
 
 edit_menu = Menu(my_menu, tearoff=False)
 my_menu.add_cascade(label="Edit", menu=edit_menu)
-edit_menu.add_command(label="Cut", command=lambda: cut_text(1))
-edit_menu.add_command(label="Copy", command=lambda: copy_text(1))
-edit_menu.add_command(label="Paste", command=lambda: paste_text(1))
-edit_menu.add_command(label="Undo")
-edit_menu.add_command(label="Redo")
+edit_menu.add_command(label="Cut", command=lambda: cut_text(1), accelerator="Ctrl+x")
+edit_menu.add_command(label="Copy", command=lambda: copy_text(1), accelerator="Ctrl+c")
+edit_menu.add_command(label="Paste", command=lambda: paste_text(1), accelerator="Ctrl+v")
+edit_menu.add_command(label="Undo", command=my_text.edit_undo, accelerator="Ctrl+z")
+edit_menu.add_command(label="Redo", command=my_text.edit_redo, accelerator="Ctrl+y")
+
+text_menu = Menu(my_menu, tearoff=False)
+my_menu.add_cascade(label="Text", menu=text_menu)
+text_menu.add_command(label="Bold", command=bold_text)
+text_menu.add_command(label="Italics", command=italics_text)
 
 status_bar = Label(root, text="Ready          ", anchor=E)
 status_bar.pack(fill=X, side=BOTTOM, ipady=5)
