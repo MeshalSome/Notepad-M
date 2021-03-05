@@ -14,7 +14,7 @@ from tkinter import messagebox
 
 root = Tk()
 root.title("Notepad-M")
-root.geometry("1200x680")
+root.geometry("824x467")
 my_frame = Frame(root)
 my_frame.pack(pady=5)
 
@@ -117,7 +117,7 @@ text_scroll.pack(side=RIGHT, fill=Y)
 x_scroll = Scrollbar(my_frame, orient='horizontal')
 x_scroll.pack(side=BOTTOM, fill=X)
 
-my_text = Text(my_frame, width=97, height=26, font=("Helvetica", 16), selectbackground="yellow", selectforeground="black", undo=True, yscrollcommand=text_scroll.set, wrap="none", xscrollcommand=x_scroll.set)
+my_text = Text(my_frame, width=97, height=26, font=("Helvetica", 11), selectforeground="black", undo=True, yscrollcommand=text_scroll.set, wrap="none", xscrollcommand=x_scroll.set)
 my_text.pack()
 
 text_scroll.config(command=my_text.yview)
